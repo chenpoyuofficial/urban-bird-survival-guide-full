@@ -30,8 +30,8 @@ function PostCard({
       <UserInfo name={authorName} time={createdAt} tag={tag} boardName={boardName} avatarSrc={authorAvatar} />
 
       <div className="flex flex-col gap-2">
-        <h3 className="line-clamp-2 text-base font-bold tracking-[1.28px] text-ink">{title}</h3>
-        <p className="line-clamp-2 text-xs leading-[1.35] text-ink/80">{excerpt}</p>
+        <h3 className="line-clamp-2 text-base font-bold tracking-[1.28px] text-ink pt-1">{title}</h3>
+        <p className="line-clamp-2 text-xs leading-[1.35] text-ink/80 py-[2px]">{excerpt}</p>
         <div className="flex items-start gap-4">
           <StatTag icon="thumb_up" value={likeCount} muted />
           <StatTag icon="visibility" value={viewCount} muted />

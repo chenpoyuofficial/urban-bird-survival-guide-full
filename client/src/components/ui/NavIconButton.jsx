@@ -14,13 +14,11 @@ function NavIconButton({ icon, label, active = false, badgeCount, onClick, class
           {icon}
         </span>
         {badgeCount != null && (
-          <span
-            className={`absolute -top-1 left-4 min-w-[14px] rounded-full border border-paper px-0.5 text-center text-[8px] font-medium leading-normal text-paper ${
+          <div className={`absolute -top-1 left-4 min-w-[14px] rounded-full border border-paper px-0.5 text-center text-[8px] font-medium leading-normal text-paper ${
               active ? 'bg-secondary' : 'bg-secondary/60'
-            }`}
-          >
-            {badgeCount}
-          </span>
+            }`}>
+            <span>{badgeCount}</span>
+          </div>
         )}
       </span>
       <span
