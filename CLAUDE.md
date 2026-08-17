@@ -61,6 +61,38 @@
 
 在 Tailwind 設定中應將以上色碼與陰影定義為自訂 theme（`tailwind.config.js` 的 `extend.colors` / `extend.boxShadow`），避免程式碼中直接寫死色碼，維持設計系統一致性。
 
+## 前端元件開發慣例
+
+專案有 Figma 設計稿，開發順序為「先刻共用元件 → 再組頁面 → 頁面先用 mock 資料 → 最後接真實 API」。
+
+**元件資料夾結構**
+```
+client/src/components/
+├── ui/              # 共用元件（Button、Input、Card、Badge、Avatar、Modal…），跨頁面重複使用
+└── features/         # 頁面/功能專屬元件（例如 PostCard、CommentList、BoardNav），與特定頁面邏輯綁定
+client/src/pages/      # 頁面組裝，將 ui/ 與 features/ 元件組合起來
+```
+
+**Icon**
+- 使用 Google 的 Material Symbols，透過 `material-symbols` npm 套件引入字型
+- 用法：`<span className="material-symbols-outlined">icon_name</span>`，`icon_name` 直接對應 Figma 標註的圖示名稱
+- 預設樣式為 outlined，除非畫面設計另有標註（rounded/sharp）
+
+**RWD**
+- Figma 稿僅提供手機版設計，桌面版也維持相同的窄版長條版型（例如用 `max-w-md mx-auto` 置中），不另外設計寬螢幕多欄版型
+- 除非之後補上桌面版設計稿，否則元件不需要額外處理 `md:`/`lg:` 等 breakpoint
+
+**元件撰寫原則**
+- 純 JavaScript（無 TypeScript），與專案既有慣例一致
+- 樣式一律使用 Tailwind utility class，並優先使用已定義的 theme token（例如 `bg-primary`、`text-neutral-black`、`shadow-soft`），不寫死色碼、不另建 CSS module（除非有 utility class 無法表達的動畫/複雜效果）
+- 共用元件（`ui/`）必須是純展示元件：只透過 props 接收資料與 callback，不得直接呼叫 API/fetch，確保可以先用 mock 資料組頁面，之後接真實 API 時只需替換頁面層的資料來源，元件本身不用改
+- 檔名與元件名一致，採 PascalCase（例如 `Button.jsx`）
+
+**元件預覽（頁面尚未完成前）**
+- 不引入 Storybook 等額外工具，改在專案內建立一個簡易 Playground 頁面（例如 `client/src/pages/Playground.jsx`，掛在 `/dev/playground` 路由）
+- 每刻好一個共用元件，就 import 進 Playground 頁面並列出主要狀態（default/hover/disabled/error 等），用 `npm run dev` 開瀏覽器直接檢視、跟 Figma 截圖比對
+- Playground 頁面僅供開發期比對外觀使用，不需要串資料或加入正式路由導覽
+
 ## Repo 架構
 
 單一 repo，前後端分開開發與部署：
