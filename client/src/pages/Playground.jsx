@@ -8,6 +8,7 @@ import StatTag from '../components/ui/StatTag'
 import Avatar from '../components/ui/Avatar'
 import UserInfo from '../components/ui/UserInfo'
 import PostCard from '../components/features/PostCard'
+import Field from '../components/ui/Field'
 import raisingChicksImg from '../assets/boards/raising-chicks.jpg'
 import survivalGuideImg from '../assets/boards/survival-guide.jpg'
 import dailySharingImg from '../assets/boards/daily-sharing.jpg'
@@ -28,6 +29,7 @@ const mockBoards = [
 ]
 
 function Playground() {
+  const [nickname, setNickname] = useState('美術東路小麻雀')
   const [favoritedKeys, setFavoritedKeys] = useState(
     () => new Set(mockBoards.filter((b) => b.favorited).map((b) => b.key)),
   )
@@ -153,6 +155,20 @@ function Playground() {
             likeCount={954}
             viewCount={2234}
             shareCount={15}
+          />
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="text-sm font-medium text-ink/60 mb-3">Field</h2>
+        <div className="flex flex-col items-start gap-4 rounded-lg border border-ink/10 bg-paper p-4 shadow-soft">
+          <Field label="暱稱" value="美術東路小麻雀" variant="display" />
+          <Field
+            label="暱稱"
+            value={nickname}
+            variant="editable"
+            onChange={setNickname}
+            className="w-full"
           />
         </div>
       </section>

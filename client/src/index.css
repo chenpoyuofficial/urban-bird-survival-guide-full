@@ -22,6 +22,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, label {
   text-box-edge: cap alphabetic;
 }
 
+
 .material-symbols-outlined {
   text-box-trim: none;
 }

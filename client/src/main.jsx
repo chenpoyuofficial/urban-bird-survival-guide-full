@@ -5,6 +5,8 @@ import './index.css'
 import App from './App.jsx'
 import Playground from './pages/Playground.jsx'
 import Board from './pages/Board.jsx'
+import Register from './pages/Register.jsx'
+import Login from './pages/Login.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -12,6 +14,8 @@ createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/board" element={<Board />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/dev/playground" element={<Playground />} />
       </Routes>
     </BrowserRouter>

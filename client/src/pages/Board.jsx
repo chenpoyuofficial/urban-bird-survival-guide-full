@@ -100,7 +100,7 @@ function Board() {
         <h2 className="mb-3 text-xl font-medium text-ink">推薦文章</h2>
         <div className="pb-1 -mx-6 px-6 scrollbar-hide grid grid-flow-col grid-rows-2 gap-4 overflow-x-auto">
           {mockRecommendedPosts.map((post) => (
-            <PostCard
+            <PostCard 
               key={post.key}
               authorName={post.authorName}
               createdAt={post.createdAt}
