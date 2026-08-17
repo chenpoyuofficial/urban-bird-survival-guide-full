@@ -1,6 +1,12 @@
+import { useState } from 'react'
 import NavIconButton from '../components/ui/NavIconButton'
 import BottomNavBar from '../components/ui/BottomNavBar'
 import Header from '../components/ui/Header'
+import BoardCard from '../components/ui/BoardCard'
+import raisingChicksImg from '../assets/boards/raising-chicks.jpg'
+import survivalGuideImg from '../assets/boards/survival-guide.jpg'
+import dailySharingImg from '../assets/boards/daily-sharing.jpg'
+import foragingInfoImg from '../assets/boards/foraging-info.jpg'
 
 const mockNavItems = [
   { key: 'board', icon: 'forum', label: '討論區', badgeCount: 12 },
@@ -9,7 +15,27 @@ const mockNavItems = [
   { key: 'settings', icon: 'settings', label: '設定' },
 ]
 
+const mockBoards = [
+  { key: 'raising-chicks', title: '育雛資訊', image: raisingChicksImg, heat: '2.2k', postCount: 95, favorited: true },
+  { key: 'survival-guide', title: '生存指南', image: survivalGuideImg, heat: '1.3k', postCount: 64 },
+  { key: 'daily-sharing', title: '日常分享', image: dailySharingImg, heat: '5.7k', postCount: 258 },
+  { key: 'foraging-info', title: '覓食情報', image: foragingInfoImg, heat: '0.6k', postCount: 35 },
+]
+
 function Playground() {
+  const [favoritedKeys, setFavoritedKeys] = useState(
+    () => new Set(mockBoards.filter((b) => b.favorited).map((b) => b.key)),
+  )
+
+  const toggleFavorite = (key) => {
+    setFavoritedKeys((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
+
   return (
     <div className="min-h-screen max-w-md mx-auto p-6">
       <h1 className="text-2xl font-bold text-ink mb-2">元件 Playground</h1>
@@ -40,6 +66,24 @@ function Playground() {
           <Header />
           <Header actionIcon="add" actionLabel="發文" />
           <Header actionLabel={null} />
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="text-sm font-medium text-ink/60 mb-3">BoardCard</h2>
+        <div className="flex flex-col gap-3 rounded-lg border border-ink/10 p-4">
+          {mockBoards.map((board) => (
+            <BoardCard
+              key={board.key}
+              title={board.title}
+              image={board.image}
+              heat={board.heat}
+              postCount={board.postCount}
+              favorited={favoritedKeys.has(board.key)}
+              onToggleFavorite={() => toggleFavorite(board.key)}
+              onClick={() => console.log('open board', board.key)}
+            />
+          ))}
         </div>
       </section>
     </div>
