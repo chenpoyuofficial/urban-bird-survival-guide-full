@@ -1,3 +1,5 @@
+import StatTag from './StatTag'
+
 function BoardCard({
   title,
   image,
@@ -45,18 +47,8 @@ function BoardCard({
       </div>
 
       <div className="relative flex items-center gap-2 rounded-full bg-paper px-2 py-1 shadow-soft">
-        <span className="flex items-center gap-0.5">
-          <span className="material-symbols-outlined text-base leading-none text-ink">
-            local_fire_department
-          </span>
-          <span className="text-xs font-medium text-ink">{heat}</span>
-        </span>
-        <span className="flex items-center gap-0.5">
-          <span className="material-symbols-outlined text-base leading-none text-ink">
-            article
-          </span>
-          <span className="text-xs font-medium text-ink">{postCount}</span>
-        </span>
+        <StatTag icon="local_fire_department" value={heat} />
+        <StatTag icon="article" value={postCount} />
       </div>
     </div>
   )

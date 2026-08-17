@@ -3,6 +3,11 @@ import NavIconButton from '../components/ui/NavIconButton'
 import BottomNavBar from '../components/ui/BottomNavBar'
 import Header from '../components/ui/Header'
 import BoardCard from '../components/ui/BoardCard'
+import Tag from '../components/ui/Tag'
+import StatTag from '../components/ui/StatTag'
+import Avatar from '../components/ui/Avatar'
+import UserInfo from '../components/ui/UserInfo'
+import PostCard from '../components/features/PostCard'
 import raisingChicksImg from '../assets/boards/raising-chicks.jpg'
 import survivalGuideImg from '../assets/boards/survival-guide.jpg'
 import dailySharingImg from '../assets/boards/daily-sharing.jpg'
@@ -84,6 +89,71 @@ function Playground() {
               onClick={() => console.log('open board', board.key)}
             />
           ))}
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="text-sm font-medium text-ink/60 mb-3">Tag</h2>
+        <div className="flex items-center gap-2 rounded-lg border border-ink/10 bg-paper p-4 shadow-soft">
+          <Tag label="注意" variant="filled" />
+          <Tag label="生存指南" variant="outline" />
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="text-sm font-medium text-ink/60 mb-3">StatTag</h2>
+        <div className="flex items-center gap-4 rounded-lg border border-ink/10 bg-paper p-4 shadow-soft">
+          <StatTag icon="thumb_up" value={2234} />
+          <StatTag icon="thumb_up" value={2234} muted />
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="text-sm font-medium text-ink/60 mb-3">Avatar</h2>
+        <div className="flex items-center gap-4 rounded-lg border border-ink/10 bg-paper p-4 shadow-soft">
+          <Avatar size="md" />
+          <Avatar size="sm" />
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="text-sm font-medium text-ink/60 mb-3">UserInfo</h2>
+        <div className="flex flex-col gap-4 rounded-lg border border-ink/10 bg-paper p-4 shadow-soft">
+          <UserInfo
+            name="愛吃櫻桃的小綠"
+            time="2 小時前"
+            tag="注意"
+            boardName="生存指南"
+          />
+          <UserInfo name="使用者名稱" variant="single" />
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="text-sm font-medium text-ink/60 mb-3">PostCard</h2>
+        <div className="flex gap-3 overflow-x-auto rounded-lg border border-ink/10 p-4">
+          <PostCard
+            authorName="愛吃櫻桃的小綠"
+            createdAt="2 小時前"
+            tag="注意"
+            boardName="生存指南"
+            title="亞灣區某新蓋大樓玻璃帷幕反射太強，經過請減速繞道！"
+            excerpt="今天早上沿著輕軌線飛過亞灣區那幾棟新大樓時，差點撞上高空大片落地窗，海天一色的反射真的太逼真了...。請南高雄的大家互相提醒家族成員。"
+            likeCount={596}
+            viewCount={1500}
+            shareCount={8}
+          />
+          <PostCard
+            authorName="澄清湖翠鳥哥"
+            createdAt="昨天"
+            tag="好康"
+            boardName="覓食情報"
+            title="澄清湖後門私人果園的桑椹熟透了，根本吃不完！"
+            excerpt="低調分享！澄清湖後山小路進去的那片私人果園，最近紫黑色的桑椹掉了一地，果肉..."
+            likeCount={954}
+            viewCount={2234}
+            shareCount={15}
+          />
         </div>
       </section>
     </div>
