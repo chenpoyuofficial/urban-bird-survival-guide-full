@@ -127,10 +127,16 @@ client/src/pages/      # 頁面組裝，將 ui/ 與 features/ 元件組合起來
 
 資料模型層級：**Board（討論區）→ Post（文章）→ Comment（留言）**
 
-- Board：固定清單，透過 seed 腳本預先建立（例如「閒聊」「技術分享」「二手交易」），**不開放使用者 CRUD**，只做讀取
-- Post：新增、讀取（列表 + 單篇）、編輯、刪除（CRUD），歸屬於特定 Board
+- Board：固定清單，透過 seed 腳本預先建立，**不開放使用者 CRUD**，只做讀取。實際清單：「育雛資訊」「生存指南」「日常分享」「覓食情報」
+- Post：新增、讀取（列表 + 單篇）、編輯、刪除（CRUD），歸屬於特定 Board；另有一個**標籤（tag）**欄位，固定清單單選（見下方 Prisma 慣例）
 - Comment：對文章新增留言、讀取留言列表、刪除自己的留言
 - 權限：僅登入使用者可發文/留言；僅本人可編輯/刪除自己的內容
+
+### 討論區首頁組成
+
+「討論區」首頁由以下區塊組成：`Header`（頁首）+ 推薦文章（橫向捲動文章卡片）+ 主題討論區（Board 卡片列表）+ `BottomNavBar`（底部導覽列）。其中主題討論區資料來源即 `GET /api/boards`，推薦文章資料來源見下方新路由。
+
+文章卡片上的讚數／觀看數／分享數、看板卡片上的熱度數字，**純前端展示用假資料，不進 Prisma schema、不與後端溝通**——例如看板卡片右上角的「最愛」愛心可以點擊切換樣式，但只改前端 local state，不會寫回資料庫。
 
 ### Route 設計
 
@@ -145,6 +151,7 @@ GET    /api/boards                     # 討論區列表
 GET    /api/boards/:boardId            # 單一討論區資訊
 
 # Posts（巢狀於 board 下新增/列表；單一資源操作走扁平路由）
+GET    /api/posts/recommended          # 推薦文章（跨 board，取最新 N 篇，依 createdAt 排序）
 GET    /api/boards/:boardId/posts      # 該討論區下的文章列表
 POST   /api/boards/:boardId/posts      # 在該討論區新增文章（需登入）
 GET    /api/posts/:id                  # 單篇文章詳情
@@ -158,6 +165,8 @@ DELETE /api/comments/:id               # 刪除留言（需登入 + 本人）
 ```
 
 設計原則：巢狀路由表示「歸屬關係」（例如新增/列表一定要知道屬於哪個 Board 或 Post），操作單一資源（讀取/編輯/刪除單筆 Post 或 Comment）則用扁平路由，因為此時只需要資源自身的 id。
+
+⚠️ Express 路由註冊順序：`GET /api/posts/recommended` 必須寫在 `GET /api/posts/:id` **之前**，否則 `recommended` 會被當成 `:id` 參數吃掉。
 
 ### Middleware 與權限
 
@@ -173,7 +182,9 @@ DELETE /api/comments/:id               # 刪除留言（需登入 + 本人）
 
 - schema 定義於 `server/prisma/schema.prisma`
 - 核心 model：`User`、`Board`、`Post`、`Comment`
-- `Board` 透過 seed 腳本（`prisma/seed.js`）預先建立固定清單，不提供對外的建立/刪除 API
+- `Board` 透過 seed 腳本（`prisma/seed.js`）預先建立固定清單（育雛資訊、生存指南、日常分享、覓食情報），不提供對外的建立/刪除 API
+- `Post.tag`：固定清單單選，用 Prisma `enum`（不另開 Tag 資料表），10 個值：注意、好康、閒聊、求助、心得、目擊、揪團、交易、提問、公告
+- 讚數／觀看數／分享數／熱度等純展示用數字**不建欄位**，只存在前端 mock 資料
 - 所有資料庫操作透過 Prisma Client，不寫原生 SQL
 - migration 使用 `prisma migrate dev`
 
