@@ -7,12 +7,14 @@ import Playground from './pages/Playground.jsx'
 import Board from './pages/Board.jsx'
 import Register from './pages/Register.jsx'
 import Login from './pages/Login.jsx'
+import Welcome from './pages/Welcome.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
+        <Route path="/welcome" element={<Welcome />} />
         <Route path="/board" element={<Board />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />

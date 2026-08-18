@@ -9,6 +9,7 @@ import Avatar from '../components/ui/Avatar'
 import UserInfo from '../components/ui/UserInfo'
 import PostCard from '../components/features/PostCard'
 import Field from '../components/ui/Field'
+import PaginationDots from '../components/ui/PaginationDots'
 import raisingChicksImg from '../assets/boards/raising-chicks.jpg'
 import survivalGuideImg from '../assets/boards/survival-guide.jpg'
 import dailySharingImg from '../assets/boards/daily-sharing.jpg'
@@ -156,6 +157,14 @@ function Playground() {
             viewCount={2234}
             shareCount={15}
           />
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="text-sm font-medium text-ink/60 mb-3">PaginationDots</h2>
+        <div className="flex flex-col gap-4 rounded-lg border border-ink/10 bg-paper p-4 shadow-soft">
+          <PaginationDots count={5} activeIndex={0} onDotClick={(i) => console.log('jump to', i)} />
+          <PaginationDots count={5} activeIndex={2} onDotClick={(i) => console.log('jump to', i)} />
         </div>
       </section>
 
