@@ -10,6 +10,10 @@ import UserInfo from '../components/ui/UserInfo'
 import PostCard from '../components/features/PostCard'
 import Field from '../components/ui/Field'
 import PaginationDots from '../components/ui/PaginationDots'
+import FilterChip from '../components/ui/FilterChip'
+import MapPin from '../components/ui/MapPin'
+import IconButton from '../components/ui/IconButton'
+import Fab from '../components/ui/Fab'
 import raisingChicksImg from '../assets/boards/raising-chicks.jpg'
 import survivalGuideImg from '../assets/boards/survival-guide.jpg'
 import dailySharingImg from '../assets/boards/daily-sharing.jpg'
@@ -165,6 +169,37 @@ function Playground() {
         <div className="flex flex-col gap-4 rounded-lg border border-ink/10 bg-paper p-4 shadow-soft">
           <PaginationDots count={5} activeIndex={0} onDotClick={(i) => console.log('jump to', i)} />
           <PaginationDots count={5} activeIndex={2} onDotClick={(i) => console.log('jump to', i)} />
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="text-sm font-medium text-ink/60 mb-3">FilterChip</h2>
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-ink/10 bg-paper p-4 shadow-soft">
+          <FilterChip icon="e911_emergency" label="救難" severity="danger" selected />
+          <FilterChip icon="emergency_home" label="警示" severity="warning" selected />
+          <FilterChip icon="eco" label="資源" severity="normal" selected />
+          <FilterChip icon="fork_spoon" label="食物" />
+          <FilterChip size="sm" icon="precision_manufacturing" label="工事" />
+          <FilterChip size="sm" icon="brand_awareness" label="噪音" severity="warning" selected />
+          <FilterChip size="sm" icon="water_drop" label="乾淨水源" severity="normal" selected />
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="text-sm font-medium text-ink/60 mb-3">MapPin</h2>
+        <div className="flex items-end gap-6 rounded-lg border border-ink/10 bg-paper p-4 shadow-soft">
+          <MapPin icon="eco" severity="normal" />
+          <MapPin icon="emergency_home" severity="warning" />
+          <MapPin icon="e911_emergency" severity="danger" />
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="text-sm font-medium text-ink/60 mb-3">IconButton / Fab</h2>
+        <div className="flex items-center gap-4 rounded-lg border border-ink/10 bg-paper p-4 shadow-soft">
+          <IconButton icon="explore" ariaLabel="定向" />
+          <IconButton icon="my_location" ariaLabel="定位" />
+          <Fab />
         </div>
       </section>
 
