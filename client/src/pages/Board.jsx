@@ -75,6 +75,7 @@ const mockRecommendedPosts = [
 const navRoutes = {
   board: '/board',
   map: '/map',
+  friends: '/friends',
 }
 
 function Board() {

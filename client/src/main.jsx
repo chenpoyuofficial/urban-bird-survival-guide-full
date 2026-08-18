@@ -6,6 +6,7 @@ import App from './App.jsx'
 import Playground from './pages/Playground.jsx'
 import Board from './pages/Board.jsx'
 import Map from './pages/Map.jsx'
+import Friends from './pages/Friends.jsx'
 import Register from './pages/Register.jsx'
 import Login from './pages/Login.jsx'
 import Welcome from './pages/Welcome.jsx'
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/board" element={<Board />} />
         <Route path="/map" element={<Map />} />
+        <Route path="/friends" element={<Friends />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dev/playground" element={<Playground />} />

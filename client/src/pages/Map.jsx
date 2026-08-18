@@ -59,6 +59,7 @@ const mockPins = [
 const navRoutes = {
   board: '/board',
   map: '/map',
+  friends: '/friends',
 }
 
 function Map() {
