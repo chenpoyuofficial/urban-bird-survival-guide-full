@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Header from '../components/ui/Header'
 import BottomNavBar from '../components/ui/BottomNavBar'
 import IconButton from '../components/ui/IconButton'
@@ -6,13 +7,7 @@ import Fab from '../components/ui/Fab'
 import MapPin from '../components/ui/MapPin'
 import MapFilterBar from '../components/features/MapFilterBar'
 import mapBackground from '../assets/map/map-background.png'
-
-const mockNavItems = [
-  { key: 'board', icon: 'forum', label: '討論區', badgeCount: 12 },
-  { key: 'map', icon: 'map', label: '地圖' },
-  { key: 'friends', icon: 'group', label: '好友', badgeCount: 1 },
-  { key: 'settings', icon: 'settings', label: '設定' },
-]
+import { mockNavItems } from '../mock/navItems'
 
 const FILTER_CATEGORIES = [
   { key: 'rescue', label: '救難', icon: 'e911_emergency', severity: 'danger' },
@@ -61,7 +56,13 @@ const mockPins = [
   { key: 'pin-6', category: 'water', icon: 'water_drop', severity: 'normal', left: 347, top: 120 },
 ]
 
+const navRoutes = {
+  board: '/board',
+  map: '/map',
+}
+
 function Map() {
+  const navigate = useNavigate()
   const [selectedMains, setSelectedMains] = useState(() => new Set())
   const [selectedSubs, setSelectedSubs] = useState({})
 
@@ -162,6 +163,7 @@ function Map() {
           <BottomNavBar
             items={mockNavItems}
             activeKey="map"
+            onItemClick={(key) => navRoutes[key] && navigate(navRoutes[key])}
             onSosClick={() => console.log('sos')}
           />
         </div>

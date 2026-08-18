@@ -18,13 +18,7 @@ import raisingChicksImg from '../assets/boards/raising-chicks.jpg'
 import survivalGuideImg from '../assets/boards/survival-guide.jpg'
 import dailySharingImg from '../assets/boards/daily-sharing.jpg'
 import foragingInfoImg from '../assets/boards/foraging-info.jpg'
-
-const mockNavItems = [
-  { key: 'board', icon: 'forum', label: '討論區', badgeCount: 12 },
-  { key: 'map', icon: 'map', label: '地圖' },
-  { key: 'friends', icon: 'group', label: '好友', badgeCount: 1 },
-  { key: 'settings', icon: 'settings', label: '設定' },
-]
+import { mockNavItems } from '../mock/navItems'
 
 const mockBoards = [
   { key: 'raising-chicks', title: '育雛資訊', image: raisingChicksImg, heat: '2.2k', postCount: 95, favorited: true },
