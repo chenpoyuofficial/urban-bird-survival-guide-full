@@ -3,13 +3,7 @@ import Header from '../components/ui/Header'
 import BottomNavBar from '../components/ui/BottomNavBar'
 import ChatCard from '../components/features/ChatCard'
 import { mockNearbyFriends, mockRecentContacts, mockFriendList } from '../mock/friends'
-import { mockNavItems } from '../mock/navItems'
-
-const navRoutes = {
-  board: '/board',
-  map: '/map',
-  friends: '/friends',
-}
+import { mockNavItems, navRoutes } from '../mock/navItems'
 
 function FriendSection({ title, friends }) {
   return (

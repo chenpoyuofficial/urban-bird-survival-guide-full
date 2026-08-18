@@ -10,6 +10,8 @@ import Friends from './pages/Friends.jsx'
 import Register from './pages/Register.jsx'
 import Login from './pages/Login.jsx'
 import Welcome from './pages/Welcome.jsx'
+import Settings from './pages/Settings.jsx'
+import EditProfile from './pages/EditProfile.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -20,6 +22,8 @@ createRoot(document.getElementById('root')).render(
         <Route path="/board" element={<Board />} />
         <Route path="/map" element={<Map />} />
         <Route path="/friends" element={<Friends />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/settings/edit" element={<EditProfile />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dev/playground" element={<Playground />} />

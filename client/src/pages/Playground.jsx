@@ -19,6 +19,7 @@ import survivalGuideImg from '../assets/boards/survival-guide.jpg'
 import dailySharingImg from '../assets/boards/daily-sharing.jpg'
 import foragingInfoImg from '../assets/boards/foraging-info.jpg'
 import { mockNavItems } from '../mock/navItems'
+import { genderOptions } from '../mock/profile'
 
 const mockBoards = [
   { key: 'raising-chicks', title: '育雛資訊', image: raisingChicksImg, heat: '2.2k', postCount: 95, favorited: true },
@@ -29,6 +30,8 @@ const mockBoards = [
 
 function Playground() {
   const [nickname, setNickname] = useState('美術東路小麻雀')
+  const [gender, setGender] = useState('MALE')
+  const [bio, setBio] = useState('手邊隨時備有紙箱與毛巾，澄清湖附近需要支援請啾我！')
   const [favoritedKeys, setFavoritedKeys] = useState(
     () => new Set(mockBoards.filter((b) => b.favorited).map((b) => b.key)),
   )
@@ -193,6 +196,7 @@ function Playground() {
         <div className="flex items-center gap-4 rounded-lg border border-ink/10 bg-paper p-4 shadow-soft">
           <IconButton icon="explore" ariaLabel="定向" />
           <IconButton icon="my_location" ariaLabel="定位" />
+          <IconButton icon="edit" ariaLabel="編輯" variant="plain" />
           <Fab />
         </div>
       </section>
@@ -206,6 +210,24 @@ function Playground() {
             value={nickname}
             variant="editable"
             onChange={setNickname}
+            className="w-full"
+          />
+          <Field
+            label="性別"
+            value={gender}
+            variant="editable"
+            type="select"
+            options={genderOptions}
+            onChange={setGender}
+            className="w-full"
+          />
+          <Field
+            label="簡介"
+            value={bio}
+            variant="editable"
+            type="textarea"
+            maxLength={100}
+            onChange={setBio}
             className="w-full"
           />
         </div>

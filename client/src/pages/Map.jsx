@@ -7,7 +7,7 @@ import Fab from '../components/ui/Fab'
 import MapPin from '../components/ui/MapPin'
 import MapFilterBar from '../components/features/MapFilterBar'
 import mapBackground from '../assets/map/map-background.png'
-import { mockNavItems } from '../mock/navItems'
+import { mockNavItems, navRoutes } from '../mock/navItems'
 
 const FILTER_CATEGORIES = [
   { key: 'rescue', label: '救難', icon: 'e911_emergency', severity: 'danger' },
@@ -55,12 +55,6 @@ const mockPins = [
   { key: 'pin-5', category: 'predator', icon: 'skull', severity: 'warning', left: 277, top: 236 },
   { key: 'pin-6', category: 'water', icon: 'water_drop', severity: 'normal', left: 347, top: 120 },
 ]
-
-const navRoutes = {
-  board: '/board',
-  map: '/map',
-  friends: '/friends',
-}
 
 function Map() {
   const navigate = useNavigate()

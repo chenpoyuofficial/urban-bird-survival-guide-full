@@ -8,7 +8,7 @@ import raisingChicksImg from '../assets/boards/raising-chicks.jpg'
 import survivalGuideImg from '../assets/boards/survival-guide.jpg'
 import dailySharingImg from '../assets/boards/daily-sharing.jpg'
 import foragingInfoImg from '../assets/boards/foraging-info.jpg'
-import { mockNavItems } from '../mock/navItems'
+import { mockNavItems, navRoutes } from '../mock/navItems'
 
 const mockBoards = [
   { key: 'raising-chicks', title: '育雛資訊', image: raisingChicksImg, heat: '2.2k', postCount: 95, favorited: true },
@@ -71,12 +71,6 @@ const mockRecommendedPosts = [
     shareCount: 2,
   },
 ]
-
-const navRoutes = {
-  board: '/board',
-  map: '/map',
-  friends: '/friends',
-}
 
 function Board() {
   const navigate = useNavigate()

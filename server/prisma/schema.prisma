@@ -8,3 +8,21 @@ datasource db {
 }
 
 // models: User / Board / Post / Comment
+
+enum Gender {
+  MALE
+  FEMALE
+  UNDISCLOSED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  nickname  String
+  habitat   String?
+  gender    Gender   @default(UNDISCLOSED)
+  bio       String?  @db.VarChar(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

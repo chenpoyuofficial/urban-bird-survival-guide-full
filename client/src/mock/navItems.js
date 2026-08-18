@@ -4,3 +4,10 @@ export const mockNavItems = [
   { key: 'friends', icon: 'group', label: '好友', badgeCount: 1 },
   { key: 'settings', icon: 'settings', label: '設定' },
 ]
+
+export const navRoutes = {
+  board: '/board',
+  map: '/map',
+  friends: '/friends',
+  settings: '/settings',
+}
