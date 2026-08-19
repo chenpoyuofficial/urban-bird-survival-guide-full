@@ -187,4 +187,23 @@ describe('DELETE /api/posts/:id', () => {
     expect(res.status).toBe(403)
     expect(res.body.error.code).toBe('FORBIDDEN')
   })
+
+  it('刪除文章時，底下的留言會一併從資料庫刪除', async () => {
+    const { token } = await registerUser(app)
+    const createRes = await request(app)
+      .post(`/api/boards/${boardId}/posts`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validPost)
+    const postId = createRes.body.post.id
+
+    await request(app)
+      .post(`/api/posts/${postId}/comments`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ content: '應該會被連帶刪除的留言' })
+
+    await request(app).delete(`/api/posts/${postId}`).set('Authorization', `Bearer ${token}`)
+
+    const remainingComments = await prisma.comment.findMany({ where: { postId } })
+    expect(remainingComments).toHaveLength(0)
+  })
 })

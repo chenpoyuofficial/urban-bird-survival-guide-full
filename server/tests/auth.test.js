@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest'
 import request from 'supertest'
+import bcrypt from 'bcrypt'
 import app from '../app.js'
 import prisma from '../lib/prisma.js'
 import { resetDatabase } from './helpers.js'
@@ -54,6 +55,16 @@ describe('POST /api/auth/register', () => {
 
     expect(res.status).toBe(400)
     expect(res.body.error.code).toBe('VALIDATION_ERROR')
+  })
+
+  it('資料庫裡存的密碼是 bcrypt hash，不是明文', async () => {
+    const res = await request(app).post('/api/auth/register').send(validUser)
+
+    const storedUser = await prisma.user.findUnique({ where: { id: res.body.user.id } })
+
+    expect(storedUser.password).not.toBe(validUser.password)
+    expect(storedUser.password).toMatch(/^\$2[aby]\$/)
+    await expect(bcrypt.compare(validUser.password, storedUser.password)).resolves.toBe(true)
   })
 })
 
