@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterAll } from 'vitest'
 import request from 'supertest'
 import app from '../app.js'
 import prisma from '../lib/prisma.js'
+import { resetDatabase } from './helpers.js'
 
 const validUser = {
   email: 'birdwatcher@example.com',
@@ -10,11 +11,11 @@ const validUser = {
 }
 
 beforeEach(async () => {
-  await prisma.user.deleteMany()
+  await resetDatabase()
 })
 
 afterAll(async () => {
-  await prisma.user.deleteMany()
+  await resetDatabase()
   await prisma.$disconnect()
 })
 

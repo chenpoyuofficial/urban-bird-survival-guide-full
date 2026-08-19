@@ -1,6 +1,9 @@
 import express from 'express'
 import cors from 'cors'
 import authRoutes from './routes/authRoutes.js'
+import boardRoutes from './routes/boardRoutes.js'
+import postRoutes from './routes/postRoutes.js'
+import commentRoutes from './routes/commentRoutes.js'
 
 const app = express()
 
@@ -16,6 +19,9 @@ app.get('/api/health', (req, res) => {
 })
 
 app.use('/api/auth', authRoutes)
+app.use('/api/boards', boardRoutes)
+app.use('/api/posts', postRoutes)
+app.use('/api/comments', commentRoutes)
 
 app.use((err, req, res, next) => {
   res.status(err.status || 500).json({
