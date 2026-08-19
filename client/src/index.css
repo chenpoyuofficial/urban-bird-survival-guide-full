@@ -1,7 +1,30 @@
+@import 'material-symbols/outlined.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  @apply bg-paper text-ink font-sans;
+  @apply text-ink font-sans;
 }
+
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+h1, h2, h3, h4, h5, h6, p, span, a, button, label {
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+}
+
+
+.material-symbols-outlined {
+  text-box-trim: none;
+}
+
+
