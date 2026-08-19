@@ -1,5 +1,7 @@
 import express from 'express'
 import cors from 'cors'
+import prisma from './lib/prisma.js'
+import AppError from './utils/AppError.js'
 import authRoutes from './routes/authRoutes.js'
 import boardRoutes from './routes/boardRoutes.js'
 import postRoutes from './routes/postRoutes.js'
@@ -14,7 +16,12 @@ app.use(
 )
 app.use(express.json())
 
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`
+  } catch {
+    throw new AppError('資料庫連線異常', 503, 'DATABASE_UNAVAILABLE')
+  }
   res.json({ status: 'ok' })
 })
 
