@@ -196,3 +196,6 @@ DELETE /api/comments/:id               # 刪除留言（需登入 + 本人）
 ## 待確認事項（開發過程中隨時可能調整）
 
 - 做廣三項功能（地圖、聊天室、緊急求助）的具體簡化程度，將視整體開發時間決定
+- Board seed 腳本（`npm run seed`）尚未接進部署流程，Railway 正式環境的資料庫需要手動跑一次才會有固定討論區清單
+- `server/` 尚未補 README（專案總覽、做深/做廣說明），預計等做廣三項功能完成後一併撰寫
+- Prisma CLI 的相依套件 `deepmerge-ts` 有已知 DoS 漏洞（僅影響開發期 CLI，不影響執行期），待 Prisma 出穩定版後可 `npm update` 處理
