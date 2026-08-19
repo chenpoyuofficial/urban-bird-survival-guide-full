@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // models: User / Board / Post / Comment
@@ -16,13 +15,64 @@ enum Gender {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String    @id @default(cuid())
+  email     String    @unique
   password  String
   nickname  String
   habitat   String?
-  gender    Gender   @default(UNDISCLOSED)
-  bio       String?  @db.VarChar(100)
+  gender    Gender    @default(UNDISCLOSED)
+  bio       String?   @db.VarChar(100)
+  posts     Post[]
+  comments  Comment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Board {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  posts     Post[]
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+}
+
+enum PostTag {
+  注意
+  好康
+  閒聊
+  求助
+  心得
+  目擊
+  揪團
+  交易
+  提問
+  公告
+}
+
+model Post {
+  id        String    @id @default(cuid())
+  title     String
+  content   String
+  tag       PostTag
+  board     Board     @relation(fields: [boardId], references: [id])
+  boardId   String
+  author    User      @relation(fields: [authorId], references: [id])
+  authorId  String
+  comments  Comment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([boardId])
+  @@index([authorId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  createdAt DateTime @default(now())
+
+  @@index([postId])
 }
