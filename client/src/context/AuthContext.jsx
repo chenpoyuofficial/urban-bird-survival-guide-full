@@ -84,6 +84,19 @@ export function AuthProvider({ children }) {
     return newUser
   }
 
+  async function updateProfile(payload) {
+    if (mode === 'real') {
+      const token = localStorage.getItem(TOKEN_KEY)
+      const { user: updatedUser } = await realAuth.updateMe(payload, token)
+      setUser(updatedUser)
+      return updatedUser
+    }
+
+    const updatedUser = fakeAuth.updateFakeUser(user.email, payload)
+    setUser(updatedUser)
+    return updatedUser
+  }
+
   function logout() {
     if (mode === 'real') {
       localStorage.removeItem(TOKEN_KEY)
@@ -99,7 +112,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ mode, user, status, login, register, logout }}>
+    <AuthContext.Provider value={{ mode, user, status, login, register, updateProfile, logout }}>
       {children}
     </AuthContext.Provider>
   )

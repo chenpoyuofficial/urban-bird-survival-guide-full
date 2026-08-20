@@ -2,6 +2,7 @@ import { ApiError } from './client'
 
 const USERS_KEY = 'bird_fake_users'
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const VALID_GENDERS = ['MALE', 'FEMALE', 'UNDISCLOSED']
 
 function readUsers() {
   try {
@@ -64,4 +65,30 @@ export function getFakeUserByEmail(email) {
   const users = readUsers()
   const user = users[email]
   return user ? toSafeUser(user) : null
+}
+
+// 驗證規則跟後端 authService.updateProfile 對齊
+export function updateFakeUser(email, { nickname, habitat, gender, bio }) {
+  const users = readUsers()
+  const user = users[email]
+  if (!user) {
+    throw new ApiError('使用者不存在', 'USER_NOT_FOUND', 404)
+  }
+  if (!nickname?.trim()) {
+    throw new ApiError('請輸入暱稱', 'VALIDATION_ERROR', 400)
+  }
+  if (bio && bio.length > 100) {
+    throw new ApiError('簡介不可超過 100 字', 'VALIDATION_ERROR', 400)
+  }
+
+  const updated = {
+    ...user,
+    nickname,
+    habitat: habitat?.trim() || null,
+    gender: VALID_GENDERS.includes(gender) ? gender : 'UNDISCLOSED',
+    bio: bio?.trim() || null,
+  }
+  users[email] = updated
+  writeUsers(users)
+  return toSafeUser(updated)
 }

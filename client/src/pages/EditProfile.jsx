@@ -3,19 +3,53 @@ import { useNavigate } from 'react-router-dom'
 import Header from '../components/ui/Header'
 import Field from '../components/ui/Field'
 import Button from '../components/ui/Button'
-import { mockProfile, genderOptions } from '../mock/profile'
+import LoadingSpinner from '../components/ui/LoadingSpinner'
+import LoginRequiredNotice from '../components/ui/LoginRequiredNotice'
+import { genderOptions } from '../mock/profile'
+import { useAuth } from '../context/AuthContext'
 
 function EditProfile() {
   const navigate = useNavigate()
-  const [nickname, setNickname] = useState(mockProfile.nickname)
-  const [habitat, setHabitat] = useState(mockProfile.habitat)
-  const [gender, setGender] = useState(mockProfile.gender)
-  const [bio, setBio] = useState(mockProfile.bio)
+  const { status, user, updateProfile } = useAuth()
 
-  const handleSubmit = (e) => {
+  if (status === 'loading') {
+    return <LoadingSpinner />
+  }
+
+  if (status === 'guest') {
+    return (
+      <div className="flex min-h-screen max-w-md mx-auto flex-col bg-paper px-6 pt-[144px]">
+        <div className="fixed inset-x-0 top-0 z-10">
+          <Header actionIcon="arrow_back" actionLabel="回上頁" onActionClick={() => navigate(-1)} className="mx-auto max-w-md" />
+        </div>
+        <LoginRequiredNotice onLoginClick={() => navigate('/login')} />
+      </div>
+    )
+  }
+
+  return <EditProfileForm user={user} updateProfile={updateProfile} navigate={navigate} />
+}
+
+function EditProfileForm({ user, updateProfile, navigate }) {
+  const [nickname, setNickname] = useState(user.nickname)
+  const [habitat, setHabitat] = useState(user.habitat ?? '')
+  const [gender, setGender] = useState(user.gender)
+  const [bio, setBio] = useState(user.bio ?? '')
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('update profile', { nickname, habitat, gender, bio })
-    navigate('/settings')
+    setError('')
+    setSubmitting(true)
+    try {
+      await updateProfile({ nickname, habitat, gender, bio })
+      navigate('/settings')
+    } catch (err) {
+      setError(err.message ?? '更新失敗，請稍後再試')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -62,7 +96,9 @@ function EditProfile() {
           />
         </div>
 
-        <Button label="儲存" type="submit" />
+        {error && <p className="text-sm font-medium text-alert">{error}</p>}
+
+        <Button label={submitting ? '儲存中...' : '儲存'} type="submit" disabled={submitting} />
       </form>
     </div>
   )

@@ -8,12 +8,12 @@ import LoadingSpinner from '../components/ui/LoadingSpinner'
 import LoginRequiredNotice from '../components/ui/LoginRequiredNotice'
 import profileBird from '../assets/settings/profile-bird.png'
 import { mockNavItems, navRoutes } from '../mock/navItems'
-import { mockProfile, genderLabels } from '../mock/profile'
+import { genderLabels } from '../mock/profile'
 import { useAuth } from '../context/AuthContext'
 
 function Settings() {
   const navigate = useNavigate()
-  const { status, logout } = useAuth()
+  const { status, user, logout } = useAuth()
 
   const handleLogout = () => {
     logout()
@@ -54,12 +54,12 @@ function Settings() {
         <div className="relative flex w-full items-center gap-[3px] rounded-xl bg-white px-3 py-4 shadow-soft">
           <img src={profileBird} alt="" className="size-[120px] shrink-0 object-contain" />
           <div className="flex flex-1 flex-col items-start gap-2 min-w-0">
-            <Field label="暱稱" value={mockProfile.nickname} />
+            <Field label="暱稱" value={user.nickname} />
             <div className="flex items-center gap-2">
-              <Field label="棲息地" value={mockProfile.habitat} />
-              <Field label="性別" value={genderLabels[mockProfile.gender]} />
+              <Field label="棲息地" value={user.habitat || '尚未填寫'} />
+              <Field label="性別" value={genderLabels[user.gender]} />
             </div>
-            <Field label="簡介" value={mockProfile.bio} className="w-full" />
+            <Field label="簡介" value={user.bio || '尚未填寫'} className="w-full" />
           </div>
           <IconButton
             icon="edit"

@@ -11,3 +11,7 @@ export function register(payload) {
 export function getMe(token) {
   return request('/auth/me', { token })
 }
+
+export function updateMe(payload, token) {
+  return request('/auth/me', { method: 'PATCH', body: payload, token })
+}
