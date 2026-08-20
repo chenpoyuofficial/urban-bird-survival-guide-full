@@ -97,6 +97,11 @@ export function AuthProvider({ children }) {
     return updatedUser
   }
 
+  // 給頁面在 mode === 'real' 時打其他需登入 API 用（例如按讚），假模式沒有真正的 token
+  function getToken() {
+    return mode === 'real' ? localStorage.getItem(TOKEN_KEY) : null
+  }
+
   function logout() {
     if (mode === 'real') {
       localStorage.removeItem(TOKEN_KEY)
@@ -112,7 +117,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ mode, user, status, login, register, updateProfile, logout }}>
+    <AuthContext.Provider value={{ mode, user, status, login, register, updateProfile, logout, getToken }}>
       {children}
     </AuthContext.Provider>
   )

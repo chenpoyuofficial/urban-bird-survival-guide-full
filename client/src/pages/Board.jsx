@@ -9,20 +9,17 @@ import { mockNavItems, navRoutes } from '../mock/navItems'
 import { mockBoards, boardImagesByName } from '../mock/boards'
 import { mockRecommendedPosts } from '../mock/posts'
 import { fetchBoards } from '../api/boards'
-import { fetchRecommendedPosts } from '../api/posts'
+import { fetchRecommendedPosts, likePost, unlikePost } from '../api/posts'
 import { useAuth } from '../context/AuthContext'
-import { hashToRange } from '../utils/hash'
 import { formatRelativeTime, truncate, formatCompactCount } from '../utils/format'
 
-// 熱度/文章數/讚數等純展示假數字，資料庫沒有這些欄位（見 CLAUDE.md），
-// 用真實資料的 id 做確定性 hash，避免重新渲染時數字亂跳
 function toDisplayBoard(board) {
   return {
     id: board.id,
     title: board.name,
     image: boardImagesByName[board.name],
-    heat: formatCompactCount(hashToRange(board.id, 300, 8000)),
-    postCount: hashToRange(`${board.id}-count`, 10, 300),
+    heat: formatCompactCount(board.heat),
+    postCount: board.postCount,
   }
 }
 
@@ -35,15 +32,15 @@ function toDisplayPost(post) {
     boardName: post.board.name,
     title: post.title,
     excerpt: truncate(post.content, 80),
-    likeCount: hashToRange(`${post.id}-like`, 20, 3000),
-    viewCount: hashToRange(`${post.id}-view`, 100, 3000),
-    shareCount: hashToRange(`${post.id}-share`, 1, 50),
+    likeCount: post.likeCount,
+    commentCount: post.commentCount,
+    likedByMe: post.likedByMe,
   }
 }
 
 function Board() {
   const navigate = useNavigate()
-  const { mode } = useAuth()
+  const { mode, status, getToken } = useAuth()
   const [boards, setBoards] = useState([])
   const [posts, setPosts] = useState([])
   const [boardsError, setBoardsError] = useState('')
@@ -75,6 +72,40 @@ function Board() {
     })
   }
 
+  const applyLikeChange = (postId, liked) => {
+    setPosts((prev) =>
+      prev.map((post) =>
+        post.id === postId
+          ? { ...post, likedByMe: liked, likeCount: post.likeCount + (liked ? 1 : -1) }
+          : post,
+      ),
+    )
+  }
+
+  const handleLikeClick = async (post) => {
+    if (status !== 'authenticated') {
+      navigate('/login')
+      return
+    }
+
+    const nextLiked = !post.likedByMe
+    applyLikeChange(post.id, nextLiked)
+
+    if (mode !== 'real') return // 假模式沒有後端可寫入，僅本地展示切換
+
+    try {
+      const token = getToken()
+      if (nextLiked) {
+        await likePost(post.id, token)
+      } else {
+        await unlikePost(post.id, token)
+      }
+    } catch (err) {
+      applyLikeChange(post.id, !nextLiked) // 失敗還原剛剛的樂觀更新
+      console.error('按讚失敗', err)
+    }
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-paper pb-24 pt-28 max-w-md mx-auto gap-6 px-6 overflow-x-clip">
       <div className="fixed inset-x-0 top-0 z-10">
@@ -97,9 +128,10 @@ function Board() {
               title={post.title}
               excerpt={post.excerpt}
               likeCount={post.likeCount}
-              viewCount={post.viewCount}
-              shareCount={post.shareCount}
+              commentCount={post.commentCount}
+              likedByMe={post.likedByMe}
               onClick={() => console.log('open post', post.id)}
+              onLikeClick={() => handleLikeClick(post)}
             />
           ))}
         </div>
