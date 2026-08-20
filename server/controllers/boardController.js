@@ -6,6 +6,6 @@ export async function listBoards(req, res) {
 }
 
 export async function getBoard(req, res) {
-  const board = await boardService.getBoardById(req.params.boardId)
+  const board = await boardService.getBoardWithStats(req.params.boardId)
   res.status(200).json({ board })
 }

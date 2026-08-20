@@ -10,9 +10,10 @@ function PostCard({
   title,
   excerpt,
   likeCount,
-  viewCount,
-  shareCount,
+  commentCount,
+  likedByMe = false,
   onClick,
+  onLikeClick,
   width = '267px',
   className = '',
 }) {
@@ -33,9 +34,21 @@ function PostCard({
         <h3 className="line-clamp-2 text-base font-bold tracking-[1.28px] text-ink py-[3px] h-10">{title}</h3>
         <p className="line-clamp-2 text-xs leading-[1.35] text-ink/80 py-0.5">{excerpt}</p>
         <div className="flex items-start gap-4">
-          <StatTag icon="thumb_up" value={likeCount} muted />
-          <StatTag icon="visibility" value={viewCount} muted />
-          <StatTag icon="send" value={shareCount} muted />
+          <StatTag
+            icon="thumb_up"
+            value={likeCount}
+            muted
+            active={likedByMe}
+            ariaLabel={likedByMe ? '取消讚' : '按讚'}
+            onClick={
+              onLikeClick &&
+              ((e) => {
+                e.stopPropagation()
+                onLikeClick()
+              })
+            }
+          />
+          <StatTag icon="chat_bubble" value={commentCount} muted />
         </div>
       </div>
     </div>

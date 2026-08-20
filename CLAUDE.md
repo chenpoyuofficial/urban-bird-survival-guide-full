@@ -125,18 +125,21 @@ client/src/pages/      # 頁面組裝，將 ui/ 與 features/ 元件組合起來
 
 ## 討論區功能範圍（做深）
 
-資料模型層級：**Board（討論區）→ Post（文章）→ Comment（留言）**
+資料模型層級：**Board（討論區）→ Post（文章）→ Comment（留言）／Like（讚）**
 
 - Board：固定清單，透過 seed 腳本預先建立，**不開放使用者 CRUD**，只做讀取。實際清單：「育雛資訊」「生存指南」「日常分享」「覓食情報」
 - Post：新增、讀取（列表 + 單篇）、編輯、刪除（CRUD），歸屬於特定 Board；另有一個**標籤（tag）**欄位，固定清單單選（見下方 Prisma 慣例）
 - Comment：對文章新增留言、讀取留言列表、刪除自己的留言
-- 權限：僅登入使用者可發文/留言；僅本人可編輯/刪除自己的內容
+- Like：對文章按讚／取消讚，一個使用者對一篇文章最多一筆讚（切換式，非累加）
+- 權限：僅登入使用者可發文/留言/按讚；僅本人可編輯/刪除自己的內容
 
 ### 討論區首頁組成
 
 「討論區」首頁由以下區塊組成：`Header`（頁首）+ 推薦文章（橫向捲動文章卡片）+ 主題討論區（Board 卡片列表）+ `BottomNavBar`（底部導覽列）。其中主題討論區資料來源即 `GET /api/boards`，推薦文章資料來源見下方新路由。
 
-文章卡片上的讚數／觀看數／分享數、看板卡片上的熱度數字，**純前端展示用假資料，不進 Prisma schema、不與後端溝通**——例如看板卡片右上角的「最愛」愛心可以點擊切換樣式，但只改前端 local state，不會寫回資料庫。
+文章卡片上顯示**讚數**與**留言數**，兩者皆為真實資料（讚數見下方 Like 相關設計；留言數為該文章 `Comment` 筆數）；原本規劃的觀看數／分享數已取消，不在文章卡片上顯示。看板卡片右上角的「最愛」愛心維持純前端 local state 切換樣式、不寫回資料庫（這是「收藏看板」，跟文章的「讚」是兩個不同概念）。
+
+看板卡片上的**熱度數字**是即時計算出的真實數字，公式：`該看板文章數 × 100 + 該看板所有文章的留言數加總 × 10 + 該看板所有文章的讚數加總 × 1`。不額外建欄位快取熱度本身，每次 `GET /api/boards` 當下即時查詢/加總——這個專案規模（4 個固定看板、作品集用途）不需要為了效能做快取欄位，優先求資料一致、不用處理快取失效。
 
 ### Route 設計
 
@@ -162,15 +165,21 @@ DELETE /api/posts/:id                  # 刪除文章（需登入 + 本人）
 GET    /api/posts/:postId/comments     # 取得某篇文章的留言列表
 POST   /api/posts/:postId/comments     # 新增留言（需登入）
 DELETE /api/comments/:id               # 刪除留言（需登入 + 本人）
+
+# Likes（讚，巢狀於 post 下；一個使用者對一篇文章最多一筆讚，不需要獨立 id）
+POST   /api/posts/:id/like             # 對文章按讚（需登入）
+DELETE /api/posts/:id/like             # 取消讚（需登入）
 ```
 
 設計原則：巢狀路由表示「歸屬關係」（例如新增/列表一定要知道屬於哪個 Board 或 Post），操作單一資源（讀取/編輯/刪除單筆 Post 或 Comment）則用扁平路由，因為此時只需要資源自身的 id。
 
 ⚠️ Express 路由註冊順序：`GET /api/posts/recommended` 必須寫在 `GET /api/posts/:id` **之前**，否則 `recommended` 會被當成 `:id` 參數吃掉。
 
+文章相關的 GET 系列（`/posts/recommended`、`/boards/:boardId/posts`、`/posts/:id`）需額外回傳 `likeCount`（該文章讚數）、`commentCount`（該文章留言數）與 `likedByMe`（目前登入使用者是否已對這篇文章按讚；訪客一律 `false`）。`GET /api/boards` 需額外回傳即時計算出的 `postCount`（該看板文章數）與 `heat`（熱度，公式見上）。
+
 ### Middleware 與權限
 
-- 需要 JWT 驗證 middleware 的 route：`POST/PUT/DELETE /posts` 系列、`POST /comments`、`DELETE /comments`
+- 需要 JWT 驗證 middleware 的 route：`POST/PUT/DELETE /posts` 系列、`POST /comments`、`DELETE /comments`、`POST/DELETE /posts/:id/like`
 - 不需要登入即可存取（訪客也能瀏覽）：所有 `GET` 系列 route
 - 編輯/刪除時除了驗證登入，還需檢查資源擁有者是否為當前使用者（本人限定）
 
@@ -181,10 +190,11 @@ DELETE /api/comments/:id               # 刪除留言（需登入 + 本人）
 ## Prisma / 資料庫慣例
 
 - schema 定義於 `server/prisma/schema.prisma`
-- 核心 model：`User`、`Board`、`Post`、`Comment`
+- 核心 model：`User`、`Board`、`Post`、`Comment`、`Like`
 - `Board` 透過 seed 腳本（`prisma/seed.js`）預先建立固定清單（育雛資訊、生存指南、日常分享、覓食情報），不提供對外的建立/刪除 API
 - `Post.tag`：固定清單單選，用 Prisma `enum`（不另開 Tag 資料表），10 個值：注意、好康、閒聊、求助、心得、目擊、揪團、交易、提問、公告
-- 讚數／觀看數／分享數／熱度等純展示用數字**不建欄位**，只存在前端 mock 資料
+- `Like`：`postId` + `userId` 組合唯一（`@@unique`），避免同一使用者對同一篇文章重複按讚；`onDelete: Cascade` 隨 Post/User 刪除
+- 文章卡片原規劃的觀看數／分享數已取消，不在畫面上顯示，也不建欄位；讚數（`Like`）、留言數（`Comment` 筆數）與看板熱度（由文章數/留言數/讚數即時加總算出，見上方討論區首頁組成）皆為真實資料，不快取
 - 所有資料庫操作透過 Prisma Client，不寫原生 SQL
 - migration 使用 `prisma migrate dev`
 

@@ -45,6 +45,16 @@ function Playground() {
     })
   }
 
+  const [likedKeys, setLikedKeys] = useState(() => new Set())
+  const toggleLike = (key) => {
+    setLikedKeys((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
+
   return (
     <div className="min-h-screen max-w-md mx-auto p-6">
       <h1 className="text-2xl font-bold text-ink mb-2">元件 Playground</h1>
@@ -143,9 +153,10 @@ function Playground() {
             boardName="生存指南"
             title="亞灣區某新蓋大樓玻璃帷幕反射太強，經過請減速繞道！"
             excerpt="今天早上沿著輕軌線飛過亞灣區那幾棟新大樓時，差點撞上高空大片落地窗，海天一色的反射真的太逼真了...。請南高雄的大家互相提醒家族成員。"
-            likeCount={596}
-            viewCount={1500}
-            shareCount={8}
+            likeCount={likedKeys.has('demo-1') ? 597 : 596}
+            commentCount={42}
+            likedByMe={likedKeys.has('demo-1')}
+            onLikeClick={() => toggleLike('demo-1')}
           />
           <PostCard
             authorName="澄清湖翠鳥哥"
@@ -154,9 +165,10 @@ function Playground() {
             boardName="覓食情報"
             title="澄清湖後門私人果園的桑椹熟透了，根本吃不完！"
             excerpt="低調分享！澄清湖後山小路進去的那片私人果園，最近紫黑色的桑椹掉了一地，果肉..."
-            likeCount={954}
-            viewCount={2234}
-            shareCount={15}
+            likeCount={955}
+            commentCount={88}
+            likedByMe
+            onLikeClick={() => {}}
           />
         </div>
       </section>

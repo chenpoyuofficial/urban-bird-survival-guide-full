@@ -129,3 +129,90 @@ describe('GET /api/auth/me', () => {
     expect(res.body.error.code).toBe('UNAUTHORIZED')
   })
 })
+
+describe('PATCH /api/auth/me', () => {
+  async function getToken() {
+    const res = await request(app).post('/api/auth/register').send(validUser)
+    return res.body.token
+  }
+
+  it('更新個人資料成功回傳新資料', async () => {
+    const token = await getToken()
+    const res = await request(app)
+      .patch('/api/auth/me')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ nickname: '賞鳥老手', habitat: '愛河沿岸', gender: 'FEMALE', bio: '喜歡在河堤散步' })
+
+    expect(res.status).toBe(200)
+    expect(res.body.user.nickname).toBe('賞鳥老手')
+    expect(res.body.user.habitat).toBe('愛河沿岸')
+    expect(res.body.user.gender).toBe('FEMALE')
+    expect(res.body.user.bio).toBe('喜歡在河堤散步')
+  })
+
+  it('habitat/bio 傳空字串會存成 null', async () => {
+    const token = await getToken()
+    const res = await request(app)
+      .patch('/api/auth/me')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ nickname: '賞鳥老手', habitat: '', gender: 'MALE', bio: '' })
+
+    expect(res.status).toBe(200)
+    expect(res.body.user.habitat).toBeNull()
+    expect(res.body.user.bio).toBeNull()
+  })
+
+  it('gender 不合法時 fallback 成 UNDISCLOSED，不回錯誤', async () => {
+    const token = await getToken()
+    const res = await request(app)
+      .patch('/api/auth/me')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ nickname: '賞鳥老手', gender: 'NOT_A_GENDER' })
+
+    expect(res.status).toBe(200)
+    expect(res.body.user.gender).toBe('UNDISCLOSED')
+  })
+
+  it('nickname 空白回傳 400 VALIDATION_ERROR', async () => {
+    const token = await getToken()
+    const res = await request(app)
+      .patch('/api/auth/me')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ nickname: '  ' })
+
+    expect(res.status).toBe(400)
+    expect(res.body.error.code).toBe('VALIDATION_ERROR')
+  })
+
+  it('bio 超過 100 字回傳 400 VALIDATION_ERROR', async () => {
+    const token = await getToken()
+    const res = await request(app)
+      .patch('/api/auth/me')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ nickname: '賞鳥老手', bio: '長'.repeat(101) })
+
+    expect(res.status).toBe(400)
+    expect(res.body.error.code).toBe('VALIDATION_ERROR')
+  })
+
+  it('不接受變更 email/password', async () => {
+    const token = await getToken()
+    const res = await request(app)
+      .patch('/api/auth/me')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ nickname: '賞鳥老手', email: 'hacked@example.com', password: 'newpassword123' })
+
+    expect(res.status).toBe(200)
+    expect(res.body.user.email).toBe(validUser.email)
+
+    const storedUser = await prisma.user.findUnique({ where: { email: validUser.email } })
+    await expect(bcrypt.compare(validUser.password, storedUser.password)).resolves.toBe(true)
+  })
+
+  it('沒帶 token 回傳 401 UNAUTHORIZED', async () => {
+    const res = await request(app).patch('/api/auth/me').send({ nickname: '賞鳥老手' })
+
+    expect(res.status).toBe(401)
+    expect(res.body.error.code).toBe('UNAUTHORIZED')
+  })
+})

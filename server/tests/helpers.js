@@ -2,6 +2,7 @@ import request from 'supertest'
 import prisma from '../lib/prisma.js'
 
 export async function resetDatabase() {
+  await prisma.like.deleteMany()
   await prisma.comment.deleteMany()
   await prisma.post.deleteMany()
   await prisma.user.deleteMany()
