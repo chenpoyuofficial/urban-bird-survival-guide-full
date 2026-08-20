@@ -206,4 +206,177 @@ describe('DELETE /api/posts/:id', () => {
     const remainingComments = await prisma.comment.findMany({ where: { postId } })
     expect(remainingComments).toHaveLength(0)
   })
+
+  it('刪除文章時，底下的讚會一併從資料庫刪除', async () => {
+    const { token } = await registerUser(app)
+    const createRes = await request(app)
+      .post(`/api/boards/${boardId}/posts`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validPost)
+    const postId = createRes.body.post.id
+
+    await request(app).post(`/api/posts/${postId}/like`).set('Authorization', `Bearer ${token}`)
+    await request(app).delete(`/api/posts/${postId}`).set('Authorization', `Bearer ${token}`)
+
+    const remainingLikes = await prisma.like.findMany({ where: { postId } })
+    expect(remainingLikes).toHaveLength(0)
+  })
+})
+
+describe('文章 GET 系列回傳 likeCount/commentCount/likedByMe', () => {
+  it('訪客瀏覽 likedByMe 一律 false，likeCount/commentCount 反映真實數字', async () => {
+    const { token } = await registerUser(app)
+    const createRes = await request(app)
+      .post(`/api/boards/${boardId}/posts`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validPost)
+    const postId = createRes.body.post.id
+
+    await request(app).post(`/api/posts/${postId}/like`).set('Authorization', `Bearer ${token}`)
+    await request(app)
+      .post(`/api/posts/${postId}/comments`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ content: '留言一則' })
+
+    const res = await request(app).get(`/api/posts/${postId}`)
+
+    expect(res.body.post.likeCount).toBe(1)
+    expect(res.body.post.commentCount).toBe(1)
+    expect(res.body.post.likedByMe).toBe(false)
+  })
+
+  it('已按讚的使用者查詢時 likedByMe 為 true', async () => {
+    const { token } = await registerUser(app)
+    const createRes = await request(app)
+      .post(`/api/boards/${boardId}/posts`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validPost)
+    const postId = createRes.body.post.id
+
+    await request(app).post(`/api/posts/${postId}/like`).set('Authorization', `Bearer ${token}`)
+
+    const res = await request(app).get(`/api/posts/${postId}`).set('Authorization', `Bearer ${token}`)
+
+    expect(res.body.post.likedByMe).toBe(true)
+  })
+
+  it('GET /api/posts/recommended 與 GET /api/boards/:boardId/posts 也回傳同樣的統計欄位', async () => {
+    const { token } = await registerUser(app)
+    await request(app)
+      .post(`/api/boards/${boardId}/posts`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validPost)
+
+    const recommendedRes = await request(app).get('/api/posts/recommended')
+    const boardPostsRes = await request(app).get(`/api/boards/${boardId}/posts`)
+
+    expect(recommendedRes.body.posts[0]).toHaveProperty('likeCount')
+    expect(recommendedRes.body.posts[0]).toHaveProperty('commentCount')
+    expect(recommendedRes.body.posts[0]).toHaveProperty('likedByMe')
+    expect(boardPostsRes.body.posts[0]).toHaveProperty('likeCount')
+    expect(boardPostsRes.body.posts[0]).toHaveProperty('commentCount')
+    expect(boardPostsRes.body.posts[0]).toHaveProperty('likedByMe')
+  })
+})
+
+describe('POST /api/posts/:id/like', () => {
+  it('登入使用者可以按讚，likeCount 增加', async () => {
+    const { token } = await registerUser(app)
+    const createRes = await request(app)
+      .post(`/api/boards/${boardId}/posts`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validPost)
+    const postId = createRes.body.post.id
+
+    const res = await request(app).post(`/api/posts/${postId}/like`).set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(204)
+    const getRes = await request(app).get(`/api/posts/${postId}`).set('Authorization', `Bearer ${token}`)
+    expect(getRes.body.post.likeCount).toBe(1)
+    expect(getRes.body.post.likedByMe).toBe(true)
+  })
+
+  it('重複按讚不會累加（切換式，非累加）', async () => {
+    const { token } = await registerUser(app)
+    const createRes = await request(app)
+      .post(`/api/boards/${boardId}/posts`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validPost)
+    const postId = createRes.body.post.id
+
+    await request(app).post(`/api/posts/${postId}/like`).set('Authorization', `Bearer ${token}`)
+    await request(app).post(`/api/posts/${postId}/like`).set('Authorization', `Bearer ${token}`)
+
+    const getRes = await request(app).get(`/api/posts/${postId}`).set('Authorization', `Bearer ${token}`)
+    expect(getRes.body.post.likeCount).toBe(1)
+  })
+
+  it('未登入回傳 401 UNAUTHORIZED', async () => {
+    const { token } = await registerUser(app)
+    const postRes = await request(app)
+      .post(`/api/boards/${boardId}/posts`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validPost)
+
+    const res = await request(app).post(`/api/posts/${postRes.body.post.id}/like`)
+
+    expect(res.status).toBe(401)
+    expect(res.body.error.code).toBe('UNAUTHORIZED')
+  })
+
+  it('文章不存在回傳 404 POST_NOT_FOUND', async () => {
+    const { token } = await registerUser(app)
+    const res = await request(app)
+      .post('/api/posts/nonexistent-id/like')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(404)
+    expect(res.body.error.code).toBe('POST_NOT_FOUND')
+  })
+})
+
+describe('DELETE /api/posts/:id/like', () => {
+  it('取消讚後 likeCount 歸零', async () => {
+    const { token } = await registerUser(app)
+    const createRes = await request(app)
+      .post(`/api/boards/${boardId}/posts`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validPost)
+    const postId = createRes.body.post.id
+
+    await request(app).post(`/api/posts/${postId}/like`).set('Authorization', `Bearer ${token}`)
+    const res = await request(app).delete(`/api/posts/${postId}/like`).set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(204)
+    const getRes = await request(app).get(`/api/posts/${postId}`).set('Authorization', `Bearer ${token}`)
+    expect(getRes.body.post.likeCount).toBe(0)
+    expect(getRes.body.post.likedByMe).toBe(false)
+  })
+
+  it('沒按過讚也可以安全呼叫（不報錯）', async () => {
+    const { token } = await registerUser(app)
+    const createRes = await request(app)
+      .post(`/api/boards/${boardId}/posts`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validPost)
+
+    const res = await request(app)
+      .delete(`/api/posts/${createRes.body.post.id}/like`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(204)
+  })
+
+  it('未登入回傳 401 UNAUTHORIZED', async () => {
+    const { token } = await registerUser(app)
+    const createRes = await request(app)
+      .post(`/api/boards/${boardId}/posts`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validPost)
+
+    const res = await request(app).delete(`/api/posts/${createRes.body.post.id}/like`)
+
+    expect(res.status).toBe(401)
+    expect(res.body.error.code).toBe('UNAUTHORIZED')
+  })
 })

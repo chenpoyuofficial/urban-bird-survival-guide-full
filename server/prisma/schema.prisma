@@ -6,7 +6,7 @@ datasource db {
   provider = "postgresql"
 }
 
-// models: User / Board / Post / Comment
+// models: User / Board / Post / Comment / Like
 
 enum Gender {
   MALE
@@ -24,6 +24,7 @@ model User {
   bio       String?   @db.VarChar(100)
   posts     Post[]
   comments  Comment[]
+  likes     Like[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -58,6 +59,7 @@ model Post {
   author    User      @relation(fields: [authorId], references: [id])
   authorId  String
   comments  Comment[]
+  likes     Like[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -74,5 +76,17 @@ model Comment {
   authorId  String
   createdAt DateTime @default(now())
 
+  @@index([postId])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
   @@index([postId])
 }
