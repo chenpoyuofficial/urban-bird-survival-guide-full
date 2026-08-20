@@ -3,15 +3,29 @@ import { useNavigate, Link } from 'react-router-dom'
 import Header from '../components/ui/Header'
 import Field from '../components/ui/Field'
 import Button from '../components/ui/Button'
+import DemoModeBanner from '../components/ui/DemoModeBanner'
+import { useAuth } from '../context/AuthContext'
 
 function Login() {
   const navigate = useNavigate()
+  const { mode, login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('login', { email, password })
+    setError('')
+    setSubmitting(true)
+    try {
+      await login(email, password)
+      navigate('/board')
+    } catch (err) {
+      setError(err.message ?? '登入失敗，請稍後再試')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -21,6 +35,7 @@ function Login() {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col items-center gap-[26px]">
+        {mode === 'fake' && <DemoModeBanner />}
         <h1 className="text-2xl font-medium text-ink">請輸入信箱與密碼</h1>
 
         <div className="flex w-full flex-col gap-2">
@@ -44,8 +59,10 @@ function Login() {
           />
         </div>
 
+        {error && <p className="text-sm font-medium text-alert">{error}</p>}
+
         <div className="flex flex-col items-center gap-2">
-          <Button label="登入" type="submit" />
+          <Button label={submitting ? '登入中...' : '登入'} type="submit" disabled={submitting} />
           <Link to="/register" className="px-1 py-3 text-base font-medium text-ink underline">
             還沒有帳號嗎？點此註冊
           </Link>
