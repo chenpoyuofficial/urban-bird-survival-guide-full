@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import { AuthProvider } from './context/AuthContext.jsx'
 import App from './App.jsx'
@@ -19,7 +19,7 @@ import EditProfile from './pages/EditProfile.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <AuthProvider>
         <Routes>
           <Route path="/" element={<App />} />
@@ -38,6 +38,6 @@ createRoot(document.getElementById('root')).render(
           <Route path="/dev/playground" element={<Playground />} />
         </Routes>
       </AuthProvider>
-    </BrowserRouter>
+    </HashRouter>
   </StrictMode>,
 )
