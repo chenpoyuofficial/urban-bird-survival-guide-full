@@ -9,7 +9,8 @@
     "start": "node index.js",
     "test": "vitest run",
     "seed": "node prisma/seed.js",
-    "seed:demo": "node prisma/seedDemoContent.js"
+    "seed:demo": "node prisma/seedDemoContent.js",
+    "seed:demo-comments": "node prisma/seedDemoComments.js"
   },
   "keywords": [],
   "author": "",
