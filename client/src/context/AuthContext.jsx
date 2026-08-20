@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { checkHealth } from '../api/client'
 import * as realAuth from '../api/auth'
 import * as fakeAuth from '../api/fakeAuth'
@@ -98,9 +98,10 @@ export function AuthProvider({ children }) {
   }
 
   // 給頁面在 mode === 'real' 時打其他需登入 API 用（例如按讚），假模式沒有真正的 token
-  function getToken() {
+  // useCallback 讓這個函式參照保持穩定，避免被用在 useEffect 依賴陣列時每次 render 都觸發重新抓取
+  const getToken = useCallback(() => {
     return mode === 'real' ? localStorage.getItem(TOKEN_KEY) : null
-  }
+  }, [mode])
 
   function logout() {
     if (mode === 'real') {

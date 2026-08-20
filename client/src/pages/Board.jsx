@@ -58,10 +58,10 @@ function Board() {
       .then((data) => setBoards(data.map(toDisplayBoard)))
       .catch((err) => setBoardsError(err.message ?? '看板載入失敗'))
 
-    fetchRecommendedPosts()
+    fetchRecommendedPosts(getToken())
       .then((data) => setPosts(data.map(toDisplayPost)))
       .catch((err) => setPostsError(err.message ?? '文章載入失敗'))
-  }, [mode])
+  }, [mode, getToken])
 
   const toggleFavorite = (id) => {
     setFavoritedKeys((prev) => {
@@ -130,7 +130,7 @@ function Board() {
               likeCount={post.likeCount}
               commentCount={post.commentCount}
               likedByMe={post.likedByMe}
-              onClick={() => console.log('open post', post.id)}
+              onClick={() => navigate(`/posts/${post.id}`)}
               onLikeClick={() => handleLikeClick(post)}
             />
           ))}
@@ -150,7 +150,7 @@ function Board() {
               postCount={board.postCount}
               favorited={favoritedKeys.has(board.id)}
               onToggleFavorite={() => toggleFavorite(board.id)}
-              onClick={() => console.log('open board', board.id)}
+              onClick={() => navigate(`/board/${board.id}`)}
             />
           ))}
         </div>
