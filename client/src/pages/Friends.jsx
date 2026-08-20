@@ -1,9 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/ui/Header'
 import BottomNavBar from '../components/ui/BottomNavBar'
+import LoadingSpinner from '../components/ui/LoadingSpinner'
+import LoginRequiredNotice from '../components/ui/LoginRequiredNotice'
 import ChatCard from '../components/features/ChatCard'
 import { mockNearbyFriends, mockRecentContacts, mockFriendList } from '../mock/friends'
 import { mockNavItems, navRoutes } from '../mock/navItems'
+import { useAuth } from '../context/AuthContext'
 
 function FriendSection({ title, friends }) {
   return (
@@ -28,6 +31,30 @@ function FriendSection({ title, friends }) {
 
 function Friends() {
   const navigate = useNavigate()
+  const { status } = useAuth()
+
+  if (status === 'loading') {
+    return <LoadingSpinner />
+  }
+
+  if (status === 'guest') {
+    return (
+      <div className="flex flex-col min-h-screen bg-paper pb-24 pt-28 max-w-md mx-auto px-6 overflow-x-clip">
+        <div className="fixed inset-x-0 top-0 z-10">
+          <Header actionLabel="" className="mx-auto max-w-md" />
+        </div>
+        <LoginRequiredNotice onLoginClick={() => navigate('/login')} />
+        <div className="fixed inset-x-0 bottom-0 z-10 w-full">
+          <BottomNavBar
+            items={mockNavItems}
+            activeKey="friends"
+            onItemClick={(key) => navRoutes[key] && navigate(navRoutes[key])}
+            className="mx-auto max-w-md"
+          />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-paper pb-24 pt-28 max-w-md mx-auto gap-6 px-6 overflow-x-clip">

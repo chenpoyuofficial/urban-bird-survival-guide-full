@@ -5,9 +5,12 @@ import BottomNavBar from '../components/ui/BottomNavBar'
 import IconButton from '../components/ui/IconButton'
 import Fab from '../components/ui/Fab'
 import MapPin from '../components/ui/MapPin'
+import LoadingSpinner from '../components/ui/LoadingSpinner'
+import LoginRequiredNotice from '../components/ui/LoginRequiredNotice'
 import MapFilterBar from '../components/features/MapFilterBar'
 import mapBackground from '../assets/map/map-background.png'
 import { mockNavItems, navRoutes } from '../mock/navItems'
+import { useAuth } from '../context/AuthContext'
 
 const FILTER_CATEGORIES = [
   { key: 'rescue', label: '救難', icon: 'e911_emergency', severity: 'danger' },
@@ -58,8 +61,32 @@ const mockPins = [
 
 function Map() {
   const navigate = useNavigate()
+  const { status } = useAuth()
   const [selectedMains, setSelectedMains] = useState(() => new Set())
   const [selectedSubs, setSelectedSubs] = useState({})
+
+  if (status === 'loading') {
+    return <LoadingSpinner />
+  }
+
+  if (status === 'guest') {
+    return (
+      <div className="flex flex-col min-h-screen bg-paper pb-24 pt-28 max-w-md mx-auto px-6 overflow-x-clip">
+        <div className="fixed inset-x-0 top-0 z-10">
+          <Header actionLabel="" className="mx-auto max-w-md" />
+        </div>
+        <LoginRequiredNotice onLoginClick={() => navigate('/login')} />
+        <div className="fixed inset-x-0 bottom-0 z-10 w-full">
+          <BottomNavBar
+            items={mockNavItems}
+            activeKey="map"
+            onItemClick={(key) => navRoutes[key] && navigate(navRoutes[key])}
+            className="mx-auto max-w-md"
+          />
+        </div>
+      </div>
+    )
+  }
 
   const toggleMain = (category) => {
     setSelectedMains((prev) => {

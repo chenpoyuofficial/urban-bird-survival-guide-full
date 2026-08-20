@@ -3,12 +3,45 @@ import Header from '../components/ui/Header'
 import BottomNavBar from '../components/ui/BottomNavBar'
 import IconButton from '../components/ui/IconButton'
 import Field from '../components/ui/Field'
+import Button from '../components/ui/Button'
+import LoadingSpinner from '../components/ui/LoadingSpinner'
+import LoginRequiredNotice from '../components/ui/LoginRequiredNotice'
 import profileBird from '../assets/settings/profile-bird.png'
 import { mockNavItems, navRoutes } from '../mock/navItems'
 import { mockProfile, genderLabels } from '../mock/profile'
+import { useAuth } from '../context/AuthContext'
 
 function Settings() {
   const navigate = useNavigate()
+  const { status, logout } = useAuth()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
+
+  if (status === 'loading') {
+    return <LoadingSpinner />
+  }
+
+  if (status === 'guest') {
+    return (
+      <div className="flex flex-col min-h-screen bg-paper pb-24 pt-28 max-w-md mx-auto px-6 overflow-x-clip">
+        <div className="fixed inset-x-0 top-0 z-10">
+          <Header actionLabel="" className="mx-auto max-w-md" />
+        </div>
+        <LoginRequiredNotice onLoginClick={() => navigate('/login')} />
+        <div className="fixed inset-x-0 bottom-0 z-10 w-full">
+          <BottomNavBar
+            items={mockNavItems}
+            activeKey="settings"
+            onItemClick={(key) => navRoutes[key] && navigate(navRoutes[key])}
+            className="mx-auto max-w-md"
+          />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-paper pb-24 pt-28 max-w-md mx-auto gap-6 px-6 overflow-x-clip">
@@ -37,6 +70,8 @@ function Settings() {
           />
         </div>
       </section>
+
+      <Button label="登出" onClick={handleLogout} className="self-center" />
 
       <div className="fixed inset-x-0 bottom-0 z-10 w-full">
         <BottomNavBar
