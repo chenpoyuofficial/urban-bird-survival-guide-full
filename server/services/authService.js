@@ -5,6 +5,7 @@ import AppError from '../utils/AppError.js'
 
 const SALT_ROUNDS = 10
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const VALID_GENDERS = ['MALE', 'FEMALE', 'UNDISCLOSED']
 
 function signToken(userId) {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' })
@@ -58,5 +59,26 @@ export async function getMe(userId) {
   if (!user) {
     throw new AppError('使用者不存在', 404, 'USER_NOT_FOUND')
   }
+  return toSafeUser(user)
+}
+
+export async function updateProfile(userId, { nickname, habitat, gender, bio }) {
+  if (!nickname?.trim()) {
+    throw new AppError('請輸入暱稱', 400, 'VALIDATION_ERROR')
+  }
+  if (bio && bio.length > 100) {
+    throw new AppError('簡介不可超過 100 字', 400, 'VALIDATION_ERROR')
+  }
+
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      nickname,
+      habitat: habitat?.trim() || null,
+      gender: VALID_GENDERS.includes(gender) ? gender : 'UNDISCLOSED',
+      bio: bio?.trim() || null,
+    },
+  })
+
   return toSafeUser(user)
 }
