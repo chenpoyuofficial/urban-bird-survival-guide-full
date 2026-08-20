@@ -80,6 +80,20 @@ describe('GET /api/boards/:boardId/posts', () => {
     expect(res.status).toBe(200)
     expect(res.body.posts).toHaveLength(1)
   })
+
+  it('最多回傳最新 20 篇，不做分頁', async () => {
+    const { token } = await registerUser(app)
+    for (let i = 0; i < 22; i++) {
+      await request(app)
+        .post(`/api/boards/${boardId}/posts`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ ...validPost, title: `第 ${i} 篇測試文章` })
+    }
+
+    const res = await request(app).get(`/api/boards/${boardId}/posts`)
+
+    expect(res.body.posts).toHaveLength(20)
+  })
 })
 
 describe('GET /api/posts/recommended', () => {

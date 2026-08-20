@@ -85,6 +85,16 @@ describe('GET /api/boards/:boardId', () => {
     expect(res.body.board.id).toBe(board.id)
   })
 
+  it('也回傳 postCount 與 heat', async () => {
+    const listRes = await request(app).get('/api/boards')
+    const boardId = listRes.body.boards[0].id
+
+    const res = await request(app).get(`/api/boards/${boardId}`)
+
+    expect(res.body.board).toHaveProperty('postCount')
+    expect(res.body.board).toHaveProperty('heat')
+  })
+
   it('找不到討論區回傳 404 BOARD_NOT_FOUND', async () => {
     const res = await request(app).get('/api/boards/nonexistent-id')
 

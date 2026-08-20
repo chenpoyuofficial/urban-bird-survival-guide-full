@@ -5,6 +5,7 @@ import { getBoardById } from './boardService.js'
 const AUTHOR_SELECT = { id: true, nickname: true, habitat: true }
 const BOARD_SELECT = { id: true, name: true }
 const RECOMMENDED_LIMIT = 10
+const BOARD_POSTS_LIMIT = 20
 const VALID_TAGS = ['注意', '好康', '閒聊', '求助', '心得', '目擊', '揪團', '交易', '提問', '公告']
 
 function assertValidTag(tag) {
@@ -67,6 +68,7 @@ export async function listPostsByBoard(boardId, userId) {
   const posts = await prisma.post.findMany({
     where: { boardId },
     orderBy: { createdAt: 'desc' },
+    take: BOARD_POSTS_LIMIT,
     include: postInclude(userId),
   })
   return posts.map(toPostResponse)

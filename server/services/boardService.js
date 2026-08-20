@@ -28,3 +28,10 @@ export async function getBoardById(boardId) {
   }
   return board
 }
+
+// 給 GET /api/boards/:boardId 用，額外算熱度/文章數；內部單純檢查看板是否存在
+// 的情境（例如發文前檢查）用上面輕量版的 getBoardById 就好，不用多算這些
+export async function getBoardWithStats(boardId) {
+  const board = await getBoardById(boardId)
+  return withStats(board)
+}
