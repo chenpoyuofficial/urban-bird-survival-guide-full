@@ -19,8 +19,8 @@ const sections = [
       '不論是在衛武營拍到鳥友飛翔的英姿，還是在家門口撿到落巢小麻雀的驚慌，這裡有一群最懂鳥、最熱心的在地鳥友。發文、留言、交換心得，讓我們一起用文字紀錄港都最繽紛的翼下生態！',
     image: welcomeBoardImg,
     imageAlt: '討論區介紹插圖',
-    imageSizeClassName: 'w-[568px] h-[310px]',
-    className: 'pt-28'
+    imageSizeClassName: 'w-[150%]',
+    className: 'pt-16'
   },
   {
     key: 'map',
@@ -30,7 +30,7 @@ const sections = [
       '哪裡的構樹果實熟了？哪裡正在修剪路樹需要注意？透過精準的 GPS 定位與多彩膠囊標籤，輕鬆掌握附近的救難、食物、資源與警示事件。因地制宜，讓你隨時化身守護城市野鳥的巡邏員。',
     image: welcomeMapImg,
     imageAlt: '地圖介紹插圖',
-    imageSizeClassName: 'w-[588px] h-[320px]',
+    imageSizeClassName: 'w-[160%]',
   },
   {
     key: 'chat',
@@ -123,7 +123,7 @@ function Welcome() {
             imageSizeClassName={section.imageSizeClassName}
             imageOverlay={
               isLastSection ? (
-                <div className="absolute top-36 inset-0 flex items-center justify-center">
+                <div className="absolute top-[72px] inset-0 flex items-center justify-center">
                   <button
                     type="button"
                     onClick={() => navigate('/register')}

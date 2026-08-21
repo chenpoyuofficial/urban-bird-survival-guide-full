@@ -8,7 +8,7 @@ function Header({
 }) {
   return (
     <header
-      className={`flex items-center justify-between bg-primary px-6 pb-3 pt-14 ${className}`}
+      className={`flex items-center justify-between bg-primary px-6 pb-3 pt-3 ${className}`}
     >
       <div className="flex shrink-0 items-center gap-2.5">
         <span className="material-symbols-outlined text-2xl leading-none text-paper">

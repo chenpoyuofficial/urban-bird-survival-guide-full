@@ -9,8 +9,8 @@ const WelcomeSection = forwardRef(function WelcomeSection(
     imageAlt = '',
     imageSizeClassName = '',
     imageOverlay,
-    outerGapClassName = 'gap-6',
-    innerGapClassName = 'gap-10',
+    outerGapClassName = 'gap-2',
+    innerGapClassName = 'gap-8',
     minHeightClassName = 'min-h-screen',
     className = '',
   },
@@ -19,7 +19,7 @@ const WelcomeSection = forwardRef(function WelcomeSection(
   return (
     <section
       ref={ref}
-      className={`flex ${minHeightClassName} w-full scroll-mt-28 flex-col items-center overflow-hidden px-6 ${outerGapClassName} ${className}`}
+      className={`flex ${minHeightClassName} w-full shrink scroll-mt-16 flex-col items-center overflow-hidden px-6 ${outerGapClassName} ${className}`}
     >
       <div className={`flex flex-col items-center text-center text-ink pt-4 ${innerGapClassName}`}>
         <h1 className="text-[40px] font-bold leading-none ">{title}</h1>
@@ -29,7 +29,7 @@ const WelcomeSection = forwardRef(function WelcomeSection(
           ))}
         </div>
         {description && (
-          <p className="w-[366px] max-w-full text-base leading-[1.3] tracking-[0.32px]">
+          <p className="w-full text-base leading-[1.3] tracking-[0.32px]">
             {description}
           </p>
         )}
